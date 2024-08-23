@@ -4,6 +4,7 @@ import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import ParallaxFlatList from "@/components/ParallaxFlatList";
 import { Link } from "expo-router";
 import { View } from "react-native";
 import Constants from "expo-constants";
@@ -11,36 +12,51 @@ import { Row, Column } from "@/components/Grid";
 import ButtonIcon from "@/components/ButtonIcon";
 import CarList from "@/components/CarList";
 import { useState, useEffect } from "react";
+import { router } from "expo-router";
 // useState: kalo setiap ada perubahan setiap component ada perubahan
 //kalo const: tidak
 
 export default function HomeScreen() {
-  const [cars, setCars] = useState([]); //variabe yang ngambil data dari array useState.
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // untuk menTrigger untuk menjalan kan function fetch API ketika screen nya di buka dan melihat ketika ada perubahan di State
+    const controller = new AbortController(); // UseEffect cleanup untuk menghindari memory Leak
+    const signal = controller.signal; // UseEffect cleanup
 
+    setLoading(true); //loading state
     const getData = async () => {
-      const response = await fetch(
-        "https://api-car-rental.binaracademy.org/customer/car"
-      );
-      const body = await response.json();
-      setCars(body);
-      // console.log(cars, body);
+      try {
+        const response = await fetch(
+          "https://api-car-rental.binaracademy.org/customer/car",
+          { signal: signal } // UseEffect cleanup
+        );
+        const body = await response.json();
+        setCars(body);
+      } catch (e) {
+        // Error Handling
+        if (err.name === "AbortError") {
+          console.log("successfully aborted");
+        } else {
+          console.log(err);
+        }
+      }
     };
     getData();
+    return () => {
+      // cancel request sebelum component di close
+      controller.abort();
+    };
   }, []);
 
-  // useState dan useEffect umeruapakan "HOOK" bawaan REACT
-
   return (
-    <ParallaxScrollView
+    <ParallaxFlatList
       headerBackgroundColor={{ light: "#A43333", dark: "#A43333" }}
       headerImage={
         <View style={styles.container}>
           <View>
-            <Text style={styles.tittleText}> Hi, GAESSSS</Text>
-            <Text style={styles.tittleText}>Location</Text>
+            <Text style={styles.titleText}>Hi, Nama</Text>
+            <Text style={styles.titleText}>Location</Text>
           </View>
           <View>
             <Image
@@ -50,66 +66,101 @@ export default function HomeScreen() {
           </View>
         </View>
       }
-    >
-      <View style={styles.banner}>
-        <View style={styles.bannerContainer}>
-          <View style={styles.bannerTextContainer}>
-            <Text style={styles.bannerText}>
-              Sewa Mobil Berkualitas di Kawasanmu
-            </Text>
-            <Button color="#3d7b3f" title="Sewa Mobil" />
+      banner={
+        <>
+          <View style={styles.banner}>
+            <View style={styles.bannerContainer}>
+              <View style={styles.bannerTextContainer}>
+                <Text style={styles.bannerText}>
+                  Sewa Mobil Berkualitas di kawasanmu
+                </Text>
+                <Button color="#3D7B3F" title="Sewa Mobil" />
+              </View>
+              <View>
+                <Image source={require("@/assets/images/img_car.png")} />
+              </View>
+            </View>
           </View>
           <View>
-            <Image source={require("@/assets/images/img_car2.png")} />
+            <Row justifyContent={"space-between"}>
+              <Column
+                style={{ justifyContent: "center", alignItems: "center" }}
+              >
+                <ButtonIcon
+                  text={"Sewa Mobil"}
+                  name={"car-outline"}
+                  color={"#ffffff"}
+                />
+                <Text style={styles.butText}> Sewa Mobil </Text>
+              </Column>
+              <Column
+                style={{ justifyContent: "center", alignItems: "center" }}
+              >
+                <ButtonIcon
+                  text={"Oleh-Oleh"}
+                  name={"cube-outline"}
+                  color={"#ffffff"}
+                />
+                <Text style={styles.butText}> Oleh-Oleh </Text>
+              </Column>
+              <Column
+                style={{ justifyContent: "center", alignItems: "center" }}
+              >
+                <ButtonIcon
+                  text={"Penginapan"}
+                  name={"key-outline"}
+                  color={"#ffffff"}
+                />
+                <Text style={styles.butText}> Penginapan </Text>
+              </Column>
+              <Column
+                style={{ justifyContent: "center", alignItems: "center" }}
+              >
+                <ButtonIcon
+                  text={"Wisata"}
+                  name={"camera-outline"}
+                  color={"#ffffff"}
+                />
+                <Text style={styles.butText}> Wisata </Text>
+              </Column>
+            </Row>
+            <View style={styles.subText}>
+              <Text style={styles.subText}> Daftar Mobil Terbaik </Text>
+            </View>
           </View>
-        </View>
-      </View>
-      <View>
-        <Row justifyContent={"space-between"}>
-          <Column style={{ justifyContent: "center", alignItems: "center" }}>
-            <ButtonIcon name={"car-outline"} color={"#ffffff"} />
-            <Text>Sewa Mobil</Text>
-          </Column>
-          <Column style={{ justifyContent: "center", alignItems: "center" }}>
-            <ButtonIcon name={"cube-outline"} color={"#ffffff"} />
-            <Text>Oleh-Oleh</Text>
-          </Column>
-          <Column style={{ justifyContent: "center", alignItems: "center" }}>
-            <ButtonIcon name={"key-outline"} color={"#ffffff"} />
-            <Text>Penginapan</Text>
-          </Column>
-          <Column style={{ justifyContent: "center", alignItems: "center" }}>
-            <ButtonIcon name={"camera-outline"} color={"#ffffff"} />
-            <Text>Wisata</Text>
-          </Column>
-        </Row>
-      </View>
-      <View>
-        {cars.length > 0 &&
-          cars.map((el) => (
-            <CarList
-              key={el.id}
-              image={{ uri: el.image }}
-              carName={el.name}
-              passenger={5}
-              baggage={2}
-              price={el.price}
-            />
-          ))}
-      </View>
-    </ParallaxScrollView>
+        </>
+      }
+      loading={loading}
+      data={cars}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => (
+        <CarList
+          style={{ marginHorizontal: 20 }}
+          key={item.id}
+          image={{ uri: item.image }}
+          carName={item.name}
+          passengers={5}
+          baggage={4}
+          price={item.price}
+          onPress={() => router.navigate("(listcar)/details/" + item.id)}
+        />
+      )}
+      viewabilityConfig={{
+        waitForInteraction: true,
+      }}
+    />
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: Constants.statusBarHeight,
+    paddingTop: Constants.statusBarHeight + 10,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
   },
-  tittleText: {
+  titleText: {
     color: "#ffffff",
     fontFamily: "PoppinsBold",
   },
@@ -117,32 +168,38 @@ const styles = StyleSheet.create({
     height: 35,
     width: 35,
   },
-  imageCar: {
-    height: 200,
-    width: 200,
-  },
   banner: {
-    flex: 1,
-    marginTop: -130,
     backgroundColor: "#AF392F",
+    marginTop: -100,
     overflow: "hidden",
-    paddingTop: 20,
     borderRadius: 5,
   },
   bannerContainer: {
-    flex: 0,
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "space-between",
+  },
+  bannerTextContainer: {
+    width: "45%",
+    padding: 15,
   },
   bannerText: {
     color: "#ffffff",
     fontFamily: "PoppinsRegular",
     fontSize: 16,
   },
-  bannerTextContainer: {
-    width: "45%",
-    padding: 10,
-    paddingBottom: 25,
+  butText: {
+    color: "#000000",
+    fontFamily: "PoppinsBold",
+    // fontSize: 20,
+  },
+  subText: {
+    paddingTop: 20,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    color: "#000000",
+    fontFamily: "PoppinsBold",
+    fontSize: 18,
   },
 });
