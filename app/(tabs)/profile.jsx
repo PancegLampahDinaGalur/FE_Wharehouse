@@ -1,6 +1,11 @@
 import { View, Text, StyleSheet, Image, Button } from "react-native";
 import React from "react";
 import Constants from "expo-constants";
+import * as SecureStore from "expo-secure-store";
+
+function getUser() {
+  return SecureStore.getItem("user");
+}
 
 export default function profile() {
   return (

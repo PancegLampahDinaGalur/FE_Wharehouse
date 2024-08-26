@@ -8,8 +8,66 @@ import {
   StyleSheet,
 } from "react-native";
 import { Link, router } from "expo-router"; // Pastikan import Link dari expo-router
+import { useState } from "react";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import ModalPopup from "../../components/modal";
+import * as SecureStore from "expo-secure-store";
+
+async function save(key, value) {
+  await SecureStore.setItemAsync(key, value);
+}
 
 export default function index() {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  // const [status, setStatus] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const handleChange = (name, text) => {
+    setFormData({
+      ...formData,
+      [name]: text,
+    });
+    console.log(formData);
+  };
+  const handleSubmit = async () => {
+    try {
+      const req = await fetch(
+        "https://api-car-rental.binaracademy.org/customer/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        }
+      );
+
+      const body = await req.json();
+      if (!req.ok)
+        throw new Error(body.message || body[0].message || "Ada Kesalahan!!");
+      console.log(body);
+      setModalVisible(true);
+      setTimeout(() => {
+        setModalVisible(false);
+        router.navigate("../(tabs)");
+      }, 1000);
+    } catch (e) {
+      console.log(e);
+      console.log(e.message);
+      setErrorMessage(e.message);
+      setModalVisible(true);
+      setTimeout(() => {
+        setModalVisible(false);
+        setErrorMessage(null);
+      }, 1000);
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -25,6 +83,7 @@ export default function index() {
         <Text style={styles.label}>Email</Text>
         <TextInput
           style={styles.input}
+          onChangeText={(text) => handleChange("email", text)}
           placeholder="Contoh: padjar@gmail.com"
           keyboardType="email-address"
         />
@@ -34,13 +93,15 @@ export default function index() {
         <Text style={styles.label}>Password</Text>
         <TextInput
           style={styles.input}
+          onChangeText={(text) => handleChange("password", text)}
           placeholder="6+ karakter"
           secureTextEntry={true}
         />
       </View>
 
       <TouchableOpacity
-        onPress={() => router.navigate("../(tabs)")}
+        onPress={() => handleSubmit(true)}
+        // onPress={() => router.navigate("../(tabs)")}
         style={styles.signInButton}
       >
         <Text style={styles.signInButtonText}>Sign In</Text>
@@ -52,6 +113,23 @@ export default function index() {
           Sign Up for free
         </Link>
       </View>
+      <ModalPopup visible={modalVisible}>
+        <View style={styles.modalBackground}>
+          <Ionicons
+            size={70}
+            name={
+              errorMessage == null || errorMessage == ""
+                ? "checkmark-circle-outline"
+                : "close-circle"
+            }
+          />
+          <Text>
+            {errorMessage == null || errorMessage == ""
+              ? "Login Berhasil!"
+              : errorMessage}
+          </Text>
+        </View>
+      </ModalPopup>
     </View>
   );
 }
@@ -121,5 +199,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "blue",
     textDecorationLine: "underline",
+  },
+  modalBackground: {
+    width: "90%",
+    backgroundColor: "#fff",
+    elevation: 20,
+    borderRadius: 4,
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

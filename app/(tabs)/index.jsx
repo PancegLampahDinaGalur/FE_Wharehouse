@@ -13,6 +13,7 @@ import ButtonIcon from "@/components/ButtonIcon";
 import CarList from "@/components/CarList";
 import { useState, useEffect } from "react";
 import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 // useState: kalo setiap ada perubahan setiap component ada perubahan
 //kalo const: tidak
 
@@ -26,6 +27,7 @@ export default function HomeScreen() {
 
     setLoading(true); //loading state
     const getData = async () => {
+      console.log(await SecureStore.getItemAsync("user"));
       try {
         const response = await fetch(
           "https://api-car-rental.binaracademy.org/customer/car",
