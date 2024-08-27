@@ -122,7 +122,7 @@ export default function register() {
           <Ionicons
             size={70}
             name={
-              errorMessage == null ? "close-circle" : "checkmark-circle-outline"
+              errorMessage == null ? "checkmark-circle-outline" : "close-circle"
             }
           />
           {errorMessage == null ? (

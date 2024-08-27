@@ -11,47 +11,67 @@ import { useState, useEffect } from "react";
 import CarList from "@/components/CarList";
 import Constants from "expo-constants";
 import { router } from "expo-router";
+import { useSelector, useDispatch } from "react-redux";
+import { getCar, selectCar } from "@/redux/reducers/car/carSlice";
 
 export default function listcar() {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const { data, isLoading } = useSelector(selectCar);
+  const dispatch = useDispatch();
+  console.log(data);
   useEffect(() => {
     const controller = new AbortController(); // UseEffect cleanup untuk menghindari memory Leak
     const signal = controller.signal; // UseEffect cleanup
 
-    setLoading(true); //loading state
-    const getData = async () => {
-      try {
-        const response = await fetch(
-          "https://api-car-rental.binaracademy.org/customer/car",
-          { signal: signal } // UseEffect cleanup
-        );
-        const body = await response.json();
-        setCars(body);
-      } catch (e) {
-        // Error Handling
-        if (err.name === "AbortError") {
-          console.log("successfully aborted");
-        } else {
-          console.log(err);
-        }
-      }
-    };
-    getData();
+    dispatch(getCar(signal));
+
     return () => {
-      // cancel request sebelum component di close
+      //cancel req sebelum component di close
       controller.abort();
     };
   }, []);
 
+  // export default function listcar() {
+  //   const [cars, setCars] = useState([]);
+  //   const [loading, setLoading] = useState(false);
+
+  //   useEffect(() => {
+  //     const controller = new AbortController(); // UseEffect cleanup untuk menghindari memory Leak
+  //     const signal = controller.signal; // UseEffect cleanup
+
+  //     setLoading(true); //loading state
+  //     const getData = async () => {
+  //       try {
+  //         const response = await fetch(
+  //           "https://api-car-rental.binaracademy.org/customer/car",
+  //           { signal: signal } // UseEffect cleanup
+  //         );
+  //         const body = await response.json();
+  //         setCars(body);
+  //       } catch (e) {
+  //         // Error Handling
+  //         if (err.name === "AbortError") {
+  //           console.log("successfully aborted");
+  //         } else {
+  //           console.log(err);
+  //         }
+  //       }
+  //     };
+  //     getData();
+  //     return () => {
+  //       // cancel request sebelum component di close
+  //       controller.abort();
+  //     };
+  //   }, []);
+
   return (
     <FlatList
       style={styles.container}
-      data={cars}
+      data={data}
       keyExtractor={(item) => item.id.toString()}
       ListEmptyComponent={
-        loading ? (
+        isLoading ? (
           <ActivityIndicator
             style={{ marginTop: 30 }}
             animating={true}

@@ -12,65 +12,96 @@ import { useState, useEffect } from "react";
 import Constants from "expo-constants";
 import { Row, Column } from "@/components/Grid";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useSelector, useDispatch } from "react-redux";
+import { getCarDetail, selectCar } from "@/redux/reducers/car/carDetailSlice";
 
 const formatCurrency = new Intl.NumberFormat("id-ID", {
   style: "currency",
   currency: "IDR",
 });
 
-export default function details() {
-  const { id } = useLocalSearchParams();
-  const [cars, setCars] = useState({});
-  const [loading, setLoading] = useState(false);
+// export default function details() {
+//   const { id } = useLocalSearchParams();
+//   const [cars, setCars] = useState({});
+//   const [loading, setLoading] = useState(false);
 
+export default function details() {
+  // const [cars, setCars] = useState([]);
+  // const [loading, setLoading] = useState(false);
+  const { data } = useSelector(selectCar);
+  const { id } = useLocalSearchParams();
+  const dispatch = useDispatch();
+  console.log(data);
   useEffect(() => {
     const controller = new AbortController(); // UseEffect cleanup untuk menghindari memory Leak
     const signal = controller.signal; // UseEffect cleanup
 
-    setLoading(true); //loading state
-    const getData = async () => {
-      console.log(id);
-      try {
-        const response = await fetch(
-          "https://api-car-rental.binaracademy.org/customer/car/" + id,
-          { signal: signal } // UseEffect cleanup
-        );
-        const body = await response.json();
-        setCars(body);
-      } catch (e) {
-        // Error Handling
-        if (err.name === "AbortError") {
-          console.log("successfully aborted");
-        } else {
-          console.log(err);
-        }
-      }
-    };
-    getData();
+    dispatch(getCarDetail({ id, signal }));
+
     return () => {
-      // cancel request sebelum component di close
+      //cancel req sebelum component di close
       controller.abort();
     };
-  }, [id]);
+  }, []);
+
+  // useEffect(() => {
+  //   const controller = new AbortController(); // UseEffect cleanup untuk menghindari memory Leak
+  //   const signal = controller.signal; // UseEffect cleanup
+
+  //   setLoading(true); //loading state
+  //   const getData = async () => {
+  //     console.log(id);
+  //     try {
+  //       const response = await fetch(
+  //         "https://api-car-rental.binaracademy.org/customer/car/" + id,
+  //         { signal: signal } // UseEffect cleanup
+  //       );
+  //       const body = await response.json();
+  //       setCars(body);
+  //     } catch (e) {
+  //       // Error Handling
+  //       if (err.name === "AbortError") {
+  //         console.log("successfully aborted");
+  //       } else {
+  //         console.log(err);
+  //       }
+  //     }
+  //   };
+  //   getData();
+  //   return () => {
+  //     // cancel request sebelum component di close
+  //     controller.abort();
+  //   };
+  // }, [id]);
 
   return (
     <View style={styles.container}>
       <ScrollView>
-        <Text style={styles.titleText}> {cars.name} </Text>
+        <Text style={styles.titleText}> {data.name} </Text>
         <Row gap={5}>
           <Column style={styles.textIcon}>
-            <Ionicons size={14} name={"people-outline"} color={"#8A8A8A"} />
+            <Ionicons
+              style={styles.iconStyle}
+              size={14}
+              name={"people-outline"}
+              color={"#8A8A8A"}
+            />
             <Text style={styles.capacityText}>{5}</Text>
           </Column>
           <Column style={styles.textIcon}>
-            <Ionicons size={14} name={"bag-outline"} color={"#8A8A8A"} />
+            <Ionicons
+              style={styles.iconStyle}
+              size={14}
+              name={"bag-outline"}
+              color={"#8A8A8A"}
+            />
             <Text style={styles.capacityText}>{4}</Text>
           </Column>
         </Row>
-        <Image style={styles.imgCar} source={{ uri: cars.image }} />
+        <Image style={styles.imgCar} source={{ uri: data.image }} />
       </ScrollView>
       <View style={styles.footer}>
-        <Text style={styles.price}>{formatCurrency.format(cars.price)}</Text>
+        <Text style={styles.price}>{formatCurrency.format(data.price)}</Text>
         <Button color="#3D7B3F" title="Lanjutkan Pembayaran" />
       </View>
     </View>
@@ -92,11 +123,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   imgCar: {
-    // marginVertical: 10,
-    height: 200,
-    width: 200,
-    alignItems: "center",
-    justifyContent: "center",
+    width: "70%", // Set width to 100% to fit the screen
+    height: "70%", // Maintain aspect ratio
+    aspectRatio: 1, // Adjust this value based on the image's aspect ratio
   },
   price: {
     fontFamily: "PoppinsBold",
@@ -122,5 +151,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 2,
+  },
+  iconStyle: {
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
