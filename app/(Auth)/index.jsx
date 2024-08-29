@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -12,14 +12,24 @@ import { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ModalPopup from "../../components/modal";
 import * as SecureStore from "expo-secure-store";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  postlogin,
+  selectDataAuth,
+  closeModal,
+} from "@/redux/reducers/auth/loginSlice";
+import { NavigationHelpersContext } from "@react-navigation/native";
 
 async function save(key, value) {
   await SecureStore.setItemAsync(key, value);
 }
 
 export default function index() {
+  const { errorMessage, isModalVisible, isError, isLogin } =
+    useSelector(selectDataAuth);
   const [modalVisible, setModalVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
+  // const [errorMessage, setErrorMessage] = useState(null);
+  const dispatch = useDispatch();
   // const [status, setStatus] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -33,41 +43,28 @@ export default function index() {
     console.log(formData);
   };
   const handleSubmit = async () => {
-    try {
-      const req = await fetch(
-        "https://api-car-rental.binaracademy.org/customer/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
-        }
-      );
+    console.log("test submit", formData);
+    dispatch(postlogin(formData));
+  };
 
-      const body = await req.json();
-      if (!req.ok)
-        throw new Error(body.message || body[0].message || "Ada Kesalahan!!");
-      console.log(body);
-      setModalVisible(true);
+  useEffect(() => {
+    if (isModalVisible) {
       setTimeout(() => {
-        setModalVisible(false);
-        router.navigate("../(tabs)");
-      }, 1000);
-    } catch (e) {
-      console.log(e);
-      console.log(e.message);
-      setErrorMessage(e.message);
-      setModalVisible(true);
-      setTimeout(() => {
-        setModalVisible(false);
-        setErrorMessage(null);
+        dispatch(closeModal());
+        if (!isError) router.replace("../(tabs)");
       }, 1000);
     }
-  };
+  }, [isModalVisible]);
+
+  // useEffect(() => {
+  //   if (isError) {
+  //     setModalVisible(true);
+  //     setTimeout(() => {
+  //       setModalVisible(false);
+  //     }, 1000);
+  //   }
+  // }, [isError]);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -113,21 +110,13 @@ export default function index() {
           Sign Up for free
         </Link>
       </View>
-      <ModalPopup visible={modalVisible}>
+      <ModalPopup visible={isModalVisible}>
         <View style={styles.modalBackground}>
           <Ionicons
             size={70}
-            name={
-              errorMessage == null || errorMessage == ""
-                ? "checkmark-circle-outline"
-                : "close-circle"
-            }
+            name={!isError ? "checkmark-circle-outline" : "close-circle"}
           />
-          <Text>
-            {errorMessage == null || errorMessage == ""
-              ? "Login Berhasil!"
-              : errorMessage}
-          </Text>
+          <Text>{!isError ? "Login Berhasil!" : errorMessage}</Text>
         </View>
       </ModalPopup>
     </View>

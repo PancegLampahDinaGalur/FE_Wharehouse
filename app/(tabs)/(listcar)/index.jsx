@@ -15,8 +15,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { getCar, selectCar } from "@/redux/reducers/car/carSlice";
 
 export default function listcar() {
-  const [cars, setCars] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [cars, setCars] = useState([]);
+  // const [loading, setLoading] = useState(false);
   const { data, isLoading } = useSelector(selectCar);
   const dispatch = useDispatch();
   console.log(data);

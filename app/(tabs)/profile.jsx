@@ -9,7 +9,13 @@ async function getUser() {
 }
 
 export default function Profile() {
-  const [user, setUser] = useState(null); // State to hold user data
+  const [user, setUser] = useState(null);
+
+  // const handleLogout = async () => {
+  //   await deleteUser();
+  //   setUserData(null);
+  //   router.navigate("../(auth)");
+  // };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -31,6 +37,14 @@ export default function Profile() {
             <Text style={styles.cardText}>
               {user.email} {/* Display user email or other data */}
             </Text>
+            <View style={styles.cardContainer}>
+              <Image
+                source={require("@/assets/images/Allura - Park 1.png")}
+                style={styles.image} // Use the image style
+              />
+              <Button color="#000000" title="Log Out" />
+              {/* onPress={handleLogout} */}
+            </View>
           </View>
         ) : (
           // If no user data, display image and button
@@ -51,7 +65,7 @@ const styles = StyleSheet.create({
   container: {
     paddingTop: Constants.statusBarHeight + 10,
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
   titleText: {
     color: "#000000",
@@ -66,8 +80,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 290,
+    height: 290,
   },
   cardText: {
     color: "#000000", // Fixed color code

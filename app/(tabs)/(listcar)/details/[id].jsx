@@ -78,10 +78,10 @@ export default function details() {
     <View style={styles.container}>
       <ScrollView>
         <Text style={styles.titleText}> {data.name} </Text>
-        <Row gap={5}>
+        <Row justifyContent={"center"}>
           <Column style={styles.textIcon}>
             <Ionicons
-              style={styles.iconStyle}
+              // style={styles.iconStyle}
               size={14}
               name={"people-outline"}
               color={"#8A8A8A"}
@@ -90,7 +90,7 @@ export default function details() {
           </Column>
           <Column style={styles.textIcon}>
             <Ionicons
-              style={styles.iconStyle}
+              // style={styles.iconStyle}
               size={14}
               name={"bag-outline"}
               color={"#8A8A8A"}
@@ -99,6 +99,15 @@ export default function details() {
           </Column>
         </Row>
         <Image style={styles.imgCar} source={{ uri: data.image }} />
+
+        {/* Card Below the Image */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Detail Mobil</Text>
+          <Text style={styles.cardText}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          </Text>
+        </View>
       </ScrollView>
       <View style={styles.footer}>
         <Text style={styles.price}>{formatCurrency.format(data.price)}</Text>
@@ -126,6 +135,9 @@ const styles = StyleSheet.create({
     width: "70%", // Set width to 100% to fit the screen
     height: "70%", // Maintain aspect ratio
     aspectRatio: 1, // Adjust this value based on the image's aspect ratio
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
   },
   price: {
     fontFamily: "PoppinsBold",
@@ -150,10 +162,39 @@ const styles = StyleSheet.create({
   textIcon: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 2,
   },
   iconStyle: {
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: "center",
+  },
+  textIcon: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
+  card: {
+    backgroundColor: "#FFFFFF", // Card background color
+    borderRadius: 10, // Rounded corners
+    padding: 15, // Padding inside the card
+    marginTop: 20, // Space above the card
+    shadowColor: "#000", // Shadow color
+    shadowOffset: { width: 0, height: 2 }, // Shadow offset
+    shadowOpacity: 0.2, // Shadow opacity
+    shadowRadius: 4, // Shadow radius
+    elevation: 3, // For Android shadow
+    width: "90%", // Width of the card
+    justifyContent: "center",
+  },
+  cardTitle: {
+    fontSize: 18, // Title font size
+    fontWeight: "bold", // Title font weight
+    marginBottom: 10, // Space below the title
+  },
+  cardText: {
+    fontSize: 14, // Text font size
+    color: "#333", // Text color
   },
 });

@@ -21,11 +21,11 @@ import { getCar, selectCar } from "@/redux/reducers/car/carSlice";
 //kalo const: tidak
 
 export default function listcar() {
-  const [cars, setCars] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [cars, setCars] = useState([]);
+  // const [loading, setLoading] = useState(false);
   const { data, isLoading } = useSelector(selectCar);
   const dispatch = useDispatch();
-  console.log(data);
+
   useEffect(() => {
     const controller = new AbortController(); // UseEffect cleanup untuk menghindari memory Leak
     const signal = controller.signal; // UseEffect cleanup
