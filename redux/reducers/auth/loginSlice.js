@@ -4,7 +4,11 @@ import { postlogin } from "./authApi"; // Import the login thunk
 // import { outer } from "expo-router"
 import * as SecureStore from 'expo-secure-store';
 
-const getStore = () => JSON.parse(SecureStore.getItem('user'))
+// const getStore = () => JSON.parse(SecureStore.getItem('user'))
+const getStore = () => {
+    const user = SecureStore.getItem('user'); // Get the item
+    return user ? JSON.parse(user) : null; // Parse only if user is not null/undefined
+}
 const setStore = (value) => SecureStore.setItem("user", JSON.stringify(value)) 
  
 const loginSlice = createSlice({
@@ -14,14 +18,20 @@ const loginSlice = createSlice({
     data: getStore() ? getStore() : {},  
     isError: false,
     isModalVisible: false,
+    isLogin: getStore() ? true : false,
     errorMessage: null,
-    isLogin: false,
+    
   },
   reducers: {
     closeModal : (state) => {
         state.isModalVisible = false;
         state.isError = false;
         state.errorMessage = null;
+    },
+    logout: (state) =>{
+      state.data = {}
+      state.isLogin = false
+      SecureStore.deleteItemAsync('user')
     }
   },
   extraReducers: (builder) => {
@@ -56,7 +66,7 @@ const loginSlice = createSlice({
 
 // Selectors
 export {postlogin} ;
-export const {closeModal} = loginSlice.actions
+export const {closeModal, logout} = loginSlice.actions
 export const selectDataAuth = state => state.dataLogin; //selector
 export default loginSlice.reducer; // Export the reducer
 

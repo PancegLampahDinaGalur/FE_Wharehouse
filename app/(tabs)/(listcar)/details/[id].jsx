@@ -14,6 +14,7 @@ import { Row, Column } from "@/components/Grid";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useSelector, useDispatch } from "react-redux";
 import { getCarDetail, selectCar } from "@/redux/reducers/car/carDetailSlice";
+import { router } from "expo-router";
 
 const formatCurrency = new Intl.NumberFormat("id-ID", {
   style: "currency",
@@ -31,7 +32,7 @@ export default function details() {
   const { data } = useSelector(selectCar);
   const { id } = useLocalSearchParams();
   const dispatch = useDispatch();
-  console.log(data);
+  // console.log(data);
   useEffect(() => {
     const controller = new AbortController(); // UseEffect cleanup untuk menghindari memory Leak
     const signal = controller.signal; // UseEffect cleanup
@@ -111,7 +112,11 @@ export default function details() {
       </ScrollView>
       <View style={styles.footer}>
         <Text style={styles.price}>{formatCurrency.format(data.price)}</Text>
-        <Button color="#3D7B3F" title="Lanjutkan Pembayaran" />
+        <Button
+          color="#3D7B3F"
+          title="Lanjutkan Pembayaran"
+          onPress={() => router.navigate("/(order)")}
+        />
       </View>
     </View>
   );

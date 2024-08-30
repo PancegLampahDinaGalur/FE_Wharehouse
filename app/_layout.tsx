@@ -37,9 +37,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
-      // if (getUser()) {
-      //   router.navigate("/(tabs)");
-      // }
+      if (getUser()) {
+        router.navigate("/(tabs)");
+      }
       setTimeout(() => {
         SplashScreen.hideAsync();
       }, 500);
@@ -56,6 +56,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(Auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(order)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
       </Provider>

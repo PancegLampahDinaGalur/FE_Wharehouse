@@ -19,7 +19,7 @@ export default function listcar() {
   // const [loading, setLoading] = useState(false);
   const { data, isLoading } = useSelector(selectCar);
   const dispatch = useDispatch();
-  console.log(data);
+  // console.log(data);
   useEffect(() => {
     const controller = new AbortController(); // UseEffect cleanup untuk menghindari memory Leak
     const signal = controller.signal; // UseEffect cleanup

@@ -20,12 +20,12 @@ import {
 } from "@/redux/reducers/auth/loginSlice";
 import { NavigationHelpersContext } from "@react-navigation/native";
 
-async function save(key, value) {
-  await SecureStore.setItemAsync(key, value);
+async function save(value) {
+  await SecureStore.setItemAsync("user", JSON.stringify(value));
 }
 
 export default function index() {
-  const { errorMessage, isModalVisible, isError, isLogin } =
+  const { data, errorMessage, isModalVisible, isError, isLogin } =
     useSelector(selectDataAuth);
   const [modalVisible, setModalVisible] = useState(false);
   // const [errorMessage, setErrorMessage] = useState(null);
@@ -45,13 +45,17 @@ export default function index() {
   const handleSubmit = async () => {
     console.log("test submit", formData);
     dispatch(postlogin(formData));
+    await save(data);
   };
 
   useEffect(() => {
     if (isModalVisible) {
       setTimeout(() => {
         dispatch(closeModal());
-        if (!isError) router.replace("../(tabs)");
+        if (!isError) {
+          //save(data);
+          router.replace("../(tabs)");
+        }
       }, 1000);
     }
   }, [isModalVisible]);
