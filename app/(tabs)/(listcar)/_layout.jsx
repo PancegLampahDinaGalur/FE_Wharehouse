@@ -9,7 +9,13 @@ export default function ListCarLayout() {
         }}
         name="index"
       />
-      <Stack.Screen name="details/[id]" />
+      <Stack.Screen
+        name="details/[id]"
+        options={{
+          headerShown: true,
+          headerTitle: "Detail Mobil",
+        }}
+      />
     </Stack>
   );
 }

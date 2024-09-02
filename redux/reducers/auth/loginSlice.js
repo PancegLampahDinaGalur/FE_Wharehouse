@@ -60,6 +60,8 @@ const loginSlice = createSlice({
         // setTimeout(() => {
         //     state.isModalVisible = false;
         // }, 2000)
+    
+    
       });
   },
 });

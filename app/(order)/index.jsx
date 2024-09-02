@@ -1,43 +1,25 @@
-import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import { View, Text } from "react-native";
 import { ProgressStep, ProgressSteps } from "react-native-progress-stepper";
-import Constants from "expo-constants";
+import Step1 from "./steps/step1";
+import Step2 from "./steps/step2";
+import Step3 from "./steps/step3";
+import React, { useState } from "react";
 
 export default function index() {
+  const [activeStep, setActiveStep] = useState(0);
   return (
     <View style={{ flex: 1 }}>
-      <ProgressSteps>
-        <ProgressStep label="Pilih Metode">
-          <View style={{ alignItems: "center" }}>
-            <Text style={styles.titleText}>Pilih Metode Pembayaran</Text>
-          </View>
+      <ProgressSteps activeStep={activeStep}>
+        <ProgressStep label="Pilih Metode" removeBtnRow={true}>
+          <Step1 setActiveStep={setActiveStep} />
         </ProgressStep>
-        <ProgressStep label="Bayar">
-          <View style={{ alignItems: "center" }}>
-            <Text style={styles.titleText}>Bayar</Text>
-          </View>
+        <ProgressStep label="Bayar" removeBtnRow={true}>
+          <Step2 setActiveStep={setActiveStep} />
         </ProgressStep>
-        <ProgressStep label="Tiket">
-          <View style={{ alignItems: "center" }}>
-            <Text style={styles.titleText}>Tiket</Text>
-          </View>
+        <ProgressStep label="Tiket" removeBtnRow={true}>
+          <Step3 setActiveStep={setActiveStep} />
         </ProgressStep>
       </ProgressSteps>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    paddingTop: Constants.statusBarHeight + 10,
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  titleText: {
-    color: "#000000",
-    fontFamily: "PoppinsBold",
-    // marginBottom: 80,
-    alignSelf: "center",
-    fontSize: 15,
-  },
-});

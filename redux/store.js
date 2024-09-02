@@ -5,8 +5,7 @@ import carSlice from "./reducers/car/carSlice";
 import carDetailSlice from "./reducers/car/carDetailSlice"
 import loginSlice from "./reducers/auth/loginSlice"
 import { DefaultNavigator } from "expo-router/build/views/Navigator";
-import createSecureStore from "redux-persist-expo-securestore";
-import { persistReducer, persistStore } from "redux-persist";
+import orderSlice from "./reducers/order/orderSlice";
 
 
 
@@ -14,6 +13,7 @@ export const store = configureStore({
     reducer: {
         car: carSlice,
         carDetail: carDetailSlice,
+        order: orderSlice,
         dataLogin: loginSlice,
     },
     enhancers: 

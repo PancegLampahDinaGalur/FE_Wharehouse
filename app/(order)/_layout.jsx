@@ -1,17 +1,21 @@
 import { Stack } from "expo-router";
-import Constants from "expo-constants";
-import { View } from "react-native";
 
-export default function () {
+export default function stepsLayout() {
   return (
-    <View style={{ marginTop: Constants.statusBarHeight, flex: 1 }}>
-      <Stack
+    <Stack>
+      <Stack.Screen
         screenOptions={{
           headerShown: false,
         }}
-      >
-        <Stack.Screen name="index" />
-      </Stack>
-    </View>
+        name="index"
+      />
+      <Stack.Screen
+        name="steps/step1"
+        options={{
+          headerShown: true,
+          headerTitle: "Pembayaran",
+        }}
+      />
+    </Stack>
   );
 }

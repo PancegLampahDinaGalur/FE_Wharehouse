@@ -1,0 +1,3 @@
+use memo dan use callback dalam react 
+use callback untuk callback untuk mememories sebuah fungsi
+use memo untuk callback untuk mememories data
