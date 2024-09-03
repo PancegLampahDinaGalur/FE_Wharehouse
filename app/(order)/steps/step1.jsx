@@ -4,10 +4,12 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
+  Pressable,
 } from "react-native";
 import { useCallback, useState } from "react";
-import { useSelector } from "react-redux";
-import { selectOrder } from "@/redux/reducers/order/orderSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectOrder, setStateByName } from "@/redux/reducers/order/orderSlice";
 import { selectCar } from "@/redux/reducers/car/carDetailSlice";
 import CarList from "@/components/CarList";
 import Button from "@/components/Button";
@@ -18,60 +20,112 @@ const formatCurrency = new Intl.NumberFormat("id-ID", {
   currency: "IDR",
 });
 
-const paymentMethod = ["BCA", "MANDIRI", "BNI"];
+const paymentMethods = [
+  { bankName: "BCA", account: 12345678, name: "a. n Super Travel" },
+  { bankName: "MANDIRI", account: 12345678, name: "a. n Super Travel" },
+  { bankName: "BNI", account: 12345678, name: "a. n Super Travel" },
+];
 
-export default function step1({ setActiveStep, onPromoApply }) {
-  const [selectedMethod, setselectedMethod] = useState(null);
-  const { carId } = useSelector(selectOrder);
+export default function step1({ setActiveStep }) {
+  // Assuming setActiveStep is passed as a prop
+  const [promoText, setPromoText] = useState(null);
+  const { selectedBank, promo } = useSelector(selectOrder);
   const { data } = useSelector(selectCar);
-  const formatIDR = useCallback((price) => formatCurrency.format(price), []); // callback untuk mememories sebuah fungsi
+  const dispatch = useDispatch();
+  const formatIDR = useCallback((price) => formatCurrency.format(price), []); // callback to memoize the function
+
   return (
     <View style={styles.container}>
-      <CarList
-        image={{ uri: data.image }}
-        carName={data.name}
-        passengers={5}
-        baggage={4}
-        price={data.price}
-      />
-      <Text style={styles.textBold}>Pilih Bank Transfer</Text>
-      <Text style={styles.textBold}>
-        Kamu bisa membayar dengan transfer melalui ATM, Internet Banking atau
-        Mobile Banking
-      </Text>
-      <View>
-        {paymentMethod.map((e) => (
-          <Button
-            style={styles.paymentMethod}
-            onPress={() => setselectedMethod(e)}
-          >
-            <Text style={styles.paymentBox}>{e}</Text>
-            <Text style={styles.paymentText}>{e} Transfer</Text>
-            {selectedMethod === e && (
-              <Ionicons size={20} name={"checkmark"} style={styles.check} />
-            )}
-          </Button>
-        ))}
-      </View>
-      <View style={styles.promoContainer}>
-        <Text style={styles.promoTitle}>% Pakai Kode Promo</Text>
-        <View style={styles.promoInputContainer}>
-          <TextInput
-            style={styles.promoInput}
-            placeholder="Tulis catatanmu di sini"
-            placeholderTextColor="#8A8A8A"
-          />
-          <TouchableOpacity style={styles.applyButton} onPress={onPromoApply}>
-            <Text style={styles.applyButtonText}>Terapkan</Text>
-          </TouchableOpacity>
+      <ScrollView>
+        <CarList
+          image={{ uri: data.image }}
+          carName={data.name}
+          passengers={5}
+          baggage={4}
+          price={data.price}
+        />
+        <Text style={styles.textBold}>Pilih Bank Transfer</Text>
+        <Text style={styles.textBold}>
+          Kamu bisa membayar dengan transfer melalui ATM, Internet Banking atau
+          Mobile Banking
+        </Text>
+        <View style={{ marginBottom: 10 }}>
+          {paymentMethods.map((e) => (
+            <Button
+              key={e.bankName}
+              style={styles.paymentMethod}
+              onPress={() =>
+                dispatch(setStateByName({ name: "selectedBank", value: e }))
+              }
+            >
+              <Text style={styles.paymentBox}>{e.bankName}</Text>
+              <Text style={styles.paymentText}>{e.bankName} Transfer</Text>
+              {selectedBank?.bankName === e.bankName && (
+                <Ionicons
+                  style={styles.check}
+                  color={"#3D7B3F"}
+                  size={20}
+                  name={"checkmark"}
+                />
+              )}
+            </Button>
+          ))}
         </View>
-      </View>
-      <View style={styles.container}>
+        <View style={styles.promoContainer}>
+          <Text style={styles.promoTitle}>% Pakai Kode Promo</Text>
+          <View style={styles.promoForm}>
+            {!promo ? (
+              <>
+                <TextInput
+                  style={styles.promoInput}
+                  onChangeText={(val) => setPromoText(val)}
+                  placeholder="Tulis promomu disini"
+                />
+                <Button
+                  style={styles.promoButton}
+                  onPress={() =>
+                    dispatch(
+                      setStateByName({
+                        name: "promo",
+                        value: promoText,
+                      })
+                    )
+                  }
+                  title={"Terapkan"}
+                  color="#3D7B3F"
+                />
+              </>
+            ) : (
+              <View style={styles.promoTextWrapper}>
+                <Text style={styles.promoText}>{promo}</Text>
+                <Pressable
+                  onPress={() =>
+                    dispatch(
+                      setStateByName({
+                        name: "promo",
+                        value: null,
+                      })
+                    )
+                  }
+                >
+                  <Ionicons
+                    style={styles.check}
+                    color={"#880808"}
+                    size={30}
+                    name={"close"}
+                  />
+                </Pressable>
+              </View>
+            )}
+          </View>
+        </View>
+      </ScrollView>
+      <View style={styles.footerContainer}>
         <View style={styles.footer}>
           <Text style={styles.price}>{formatIDR(data.price || 0)}</Text>
           <View style={styles.buttonContainer}>
             <Button
-              disabled={selectedMethod ? false : true}
+              disabled={!selectedBank}
               color="#3D7B3F"
               onPress={() => {
                 setActiveStep(1);
@@ -88,18 +142,18 @@ export default function step1({ setActiveStep, onPromoApply }) {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
+    flex: 1,
   },
   textBold: {
     fontFamily: "PoppinsBold",
     fontSize: 14,
-    // marginBottom: 10,
   },
   paymentMethod: {
     flexDirection: "row",
     alignItems: "flex-start",
     padding: 20,
-    borderWidthBottom: 1,
-    borderColorBottom: "#D0D0D0",
+    borderBottomWidth: 1,
+    borderBottomColor: "#D0D0D0",
   },
   paymentBox: {
     width: "35%",
@@ -113,17 +167,18 @@ const styles = StyleSheet.create({
   paymentText: {
     fontSize: 14,
     color: "#000000",
-    flex: 1, // Allow the text to take available space
-    textAlign: "left", // Align text to the left
+    flex: 1,
+    textAlign: "left",
     paddingTop: 10,
+    fontFamily: "PoppinsBold",
   },
-  container: {
+  footerContainer: {
     flex: 1,
     padding: 10,
   },
   footer: {
     marginTop: 20,
-    alignItems: "center", // Center the content in the footer
+    alignItems: "center",
   },
   price: {
     flexDirection: "row",
@@ -134,9 +189,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   buttonContainer: {
-    width: "100%", // Full width for the button
-    borderRadius: 5, // Rounded corners
-    overflow: "hidden", // Ensure the button has rounded corners
+    width: "100%",
+    borderRadius: 5,
+    overflow: "hidden",
   },
   promoContainer: {
     marginTop: 30,
@@ -145,30 +200,32 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 10,
+    fontFamily: "PoppinsBold",
   },
-  promoInputContainer: {
+  promoForm: {
     flexDirection: "row",
-    alignItems: "center",
+    marginBottom: 10,
   },
   promoInput: {
-    flex: 1,
     borderWidth: 1,
-    borderColor: "#D0D0D0",
-    borderRadius: 2,
-    padding: 5,
-    // marginRight: 10, // Space between input and button
+    paddingHorizontal: 10,
+    borderColor: "#000",
+    width: "70%",
   },
-  applyButton: {
-    backgroundColor: "#3D7B3F", // Dark green background
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 2,
+  promoButton: {
+    width: "30%",
+    borderWidth: 1,
+    borderColor: "#3D7B3F",
+  },
+  promoTextWrapper: {
+    flex: 1,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
   },
-  applyButtonText: {
-    color: "#FFFFFF", // White text color
-    fontWeight: "bold",
+  promoText: {
+    fontFamily: "PoppinsBold",
+    fontSize: 16,
   },
   check: {
     marginLeft: "auto",

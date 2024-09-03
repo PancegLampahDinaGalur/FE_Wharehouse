@@ -188,7 +188,10 @@ export default function Profile() {
             <Button
               // style={styles.buttonStyle}
               title={"logout"}
-              onPress={() => dispatch(logout())}
+              onPress={() => {
+                dispatch(logout());
+                router.replace("/(Auth)");
+              }}
             />
           </View>
         </>

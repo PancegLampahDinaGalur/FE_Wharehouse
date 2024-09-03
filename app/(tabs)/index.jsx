@@ -16,6 +16,7 @@ import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useSelector, useDispatch } from "react-redux";
 import { getCar, selectCar } from "@/redux/reducers/car/carSlice";
+import GeoLocation from "@/components/Geolocation";
 
 // useState: kalo setiap ada perubahan setiap component ada perubahan
 //kalo const: tidak
@@ -67,8 +68,8 @@ export default function listcar() {
       headerImage={
         <View style={styles.container}>
           <View>
-            <Text style={styles.titleText}>Hi, Nama</Text>
-            <Text style={styles.titleText}>Location</Text>
+            <Text style={styles.titleText}>Hi, Budyyy</Text>
+            <GeoLocation />
           </View>
           <View>
             <Image

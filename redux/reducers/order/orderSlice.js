@@ -1,24 +1,33 @@
 import { createSlice } from "@reduxjs/toolkit";
-// import { postOrder } from "./authApi";
-import * as SecureStore from 'expo-secure-store';
+
+const initialState = {
+  isLoading: false,
+  carId: null,
+  startRent: null,
+  endRent: null,
+  data: {},
+  currentStep: 0,
+  paymentCountdown: null,
+  selectedBank: null,
+  promo: null,
+  verificationCountdown: null,
+  errorMessage: null,
+};
 
 const orderSlice = createSlice({
   name: "user",
-  initialState: {
-    isLoading: false,
-    carId: null,
-    startRent: null,
-    endRent: null,
-    data: {},
-    paymentCountdown: null,
-    paymentMethod: null,
-    verificationCountdown: null,
-    errorMessage: null,
-  },
+  initialState: initialState,
   reducers: {
     setCarId: (state, { payload }) => {
       state.carId = payload;
     },
+    setStateByName: (state, { payload }) => {
+      const { name, value } = payload;
+      state[name] = value;
+    },
+    resetState: (state) => {
+      state = initialState
+    }
   },
   extraReducers: (builder) => {
     // builder.addCase(postorder.pending, (state, action) => {
@@ -39,6 +48,6 @@ const orderSlice = createSlice({
 });
 
 // export { postorder };
-export const { setCarId } = orderSlice.actions
-export const selectOrder = state => state.order //selector
-export default orderSlice.reducer
+export const { setCarId, setStateByName, resetState } = orderSlice.actions;
+export const selectOrder = (state) => state.order; //selector
+export default orderSlice.reducer;
