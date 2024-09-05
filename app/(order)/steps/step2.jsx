@@ -6,16 +6,19 @@ import {
   TextInput,
   TouchableOpacity,
   Pressable,
+  Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CarList from "@/components/CarList";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCar } from "@/redux/reducers/car/carDetailSlice";
 import { selectOrder } from "@/redux/reducers/order/orderSlice";
-import Button from "@/components/Button";
 import { Ionicons } from "@expo/vector-icons";
 import CountDown from "react-native-countdown-component-maintained";
 import * as Clipboard from "expo-clipboard";
+import * as ImagePicker from "expo-image-picker";
+import ConfirmationModal from "./ConfirmationModal"; // Default import
+// import { selectOrder } from "@/redux/reducers/order/orderSlice";
 
 function getDate24() {
   const date24 = new Date();
@@ -24,22 +27,30 @@ function getDate24() {
 }
 
 export default function Step2() {
-  //   const [remainingTime, setRemainingTime] = useState(0);
-
-  //   useEffect(() => {
-  //     // Calculate the remaining time in seconds until the target time
-  //     const targetTime = new Date("2022-06-19T13:00:00").getTime(); // Target time
-  //     const currentTime = new Date().getTime(); // Current time
-  //     const timeLeft = Math.max((targetTime - currentTime) / 1000, 0); // Remaining time in seconds
-  //     setRemainingTime(timeLeft);
-  //   }, []);
-
   const [promoText, setPromoText] = useState(null);
-  const { selectedBank, promo } = useSelector(selectOrder);
+  const { selectedBank, promo, dataOrder } = useSelector(selectOrder);
   const { data } = useSelector(selectCar);
   const dispatch = useDispatch();
+  const [image, setImage] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
   const copyToClipboard = async (text) => {
     await Clipboard.setStringAsync(text);
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    console.log(result);
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      return true; // Indicate that an image was selected
+    }
+    return false; // Indicate that no image was selected
   };
 
   const formattedDate = new Date(getDate24()).toLocaleString("id-ID", {
@@ -52,20 +63,14 @@ export default function Step2() {
     second: "numeric",
   });
 
+  // useEffect(() => {
+  //   console.log("dataOrder", dataOrder);
+  // }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.timerContainer}>
         <Text style={styles.timer}>Selesaikan Pembayaran Sebelum</Text>
-        {/* <CountDown
-          until={remainingTime} // Remaining time in seconds
-          size={14}
-          digitStyle={styles.digitStyle}
-          digitTxtStyle={styles.digitTxtStyle}
-          timeToShow={["H", "M", "S"]}
-          timeLabels={{ h: null, m: null, s: null }}
-          showSeparator
-          separatorStyle={styles.separatorStyle}
-        /> */}
         <CountDown
           until={86400} // Remaining time in seconds
           size={12}
@@ -97,19 +102,12 @@ export default function Step2() {
         </View>
       </View>
       <Text style={styles.inputPay}>Nomor Rekening</Text>
-      {/* <TextInput
-        style={styles.input}
-        placeholder="Nomor Rekening"
-        value="xxxx-xxxx-xxxx"
-        editable={false}
-      /> */}
       <View
         style={[
           styles.input,
           {
             flexDirection: "row",
             justifyContent: "space-between",
-            // alignItems: "center",
           },
         ]}
       >
@@ -121,19 +119,12 @@ export default function Step2() {
         </TouchableOpacity>
       </View>
       <Text style={styles.inputPay}>Total Bayar</Text>
-      {/* <TextInput
-        style={styles.input}
-        placeholder="Total Bayar"
-        value="Rp 230.000"
-        editable={false}
-      /> */}
       <View
         style={[
           styles.input,
           {
             flexDirection: "row",
             justifyContent: "space-between",
-            // alignItems: "center",
           },
         ]}
       >
@@ -145,12 +136,38 @@ export default function Step2() {
       <Text style={styles.confirmationText}>
         Klik konfirmasi pembayaran untuk mempercepat proses pengecekan
       </Text>
-      <TouchableOpacity style={styles.confirmButton}>
+      <TouchableOpacity
+        style={styles.confirmButton}
+        onPress={() => setModalVisible(true)}
+      >
         <Text style={styles.confirmButtonText}>Konfirmasi Pembayaran</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.orderButton}>
         <Text style={styles.orderButtonText}>Lihat Daftar Pesanan</Text>
       </TouchableOpacity>
+      <ConfirmationModal
+        visible={modalVisible}
+        onClose={(success) => {
+          setModalVisible(false);
+          if (success) {
+            // Handle success case
+            // For example, navigate to the order list screen or refresh the order list
+            // dispatch(fetchOrders()); // Assuming you have a fetchOrders action
+          }
+        }}
+        onConfirm={async () => {
+          // Logic for handling confirmation
+          // For example, you might want to dispatch an action to confirm the payment
+          try {
+            // Assuming you have a confirmPayment action
+            await dispatch(confirmPayment({ image, promoText })); // Pass necessary data
+            Alert.alert("Success", "Payment confirmed successfully!");
+          } catch (error) {
+            Alert.alert("Error", "There was an issue confirming your payment.");
+          }
+        }}
+        pickImage={pickImage} // Pass the pickImage function
+      />
     </View>
   );
 }
@@ -161,21 +178,9 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#fff",
   },
-  header: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  orderId: {
-    fontSize: 14,
-    marginVertical: 10,
-  },
-  stepsContainer: {
+  timerContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 10,
-  },
-  step: {
-    fontSize: 14,
+    alignItems: "center",
   },
   timer: {
     fontSize: 14,
@@ -183,40 +188,10 @@ const styles = StyleSheet.create({
     color: "#000000",
     fontFamily: "PoppinsBold",
   },
-  time: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "red",
-  },
   date: {
     fontSize: 14,
     color: "#000000",
     fontFamily: "PoppinsBold",
-  },
-  carContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
-    padding: 10,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 10,
-  },
-  carImage: {
-    width: 100,
-    height: 100,
-    marginRight: 10,
-  },
-  carDetails: {
-    flex: 1,
-  },
-  carName: {
-    fontSize: 16,
-    color: "#000000",
-    fontFamily: "PoppinsBold",
-  },
-  carPrice: {
-    fontSize: 16,
-    color: "green",
   },
   transferTitle: {
     fontSize: 16,
@@ -224,21 +199,27 @@ const styles = StyleSheet.create({
     fontFamily: "PoppinsBold",
     marginVertical: 10,
   },
-  bankContainer: {
+  paymentMethodContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 10,
   },
-  bankName: {
-    fontSize: 16,
-    color: "#000000",
-    fontFamily: "PoppinsBold",
+  paymentMethodButton: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
     marginRight: 10,
+  },
+  paymentMethodText: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  paymentDetails: {
+    flex: 1,
   },
   bankDetails: {
     fontSize: 14,
-    color: "#000000",
-    fontFamily: "PoppinsBold",
   },
   input: {
     borderWidth: 1,
@@ -278,45 +259,5 @@ const styles = StyleSheet.create({
     color: "#3D7B3F",
     fontSize: 16,
     fontFamily: "PoppinsBold",
-  },
-  timerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  digitStyle: {
-    backgroundColor: "#FF3366",
-    borderRadius: 5,
-    padding: 5,
-  },
-  digitTxtStyle: {
-    color: "#FFF",
-    fontWeight: "bold",
-  },
-  paymentMethodContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  paymentMethodButton: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    marginRight: 10,
-  },
-  paymentMethodText: {
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  paymentDetails: {
-    flex: 1,
-  },
-  bankDetails: {
-    fontSize: 14,
-  },
-  stepsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 10,
   },
 });

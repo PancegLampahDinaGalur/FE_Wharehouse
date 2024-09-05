@@ -69,6 +69,6 @@ const loginSlice = createSlice({
 // Selectors
 export {postlogin} ;
 export const {closeModal, logout} = loginSlice.actions
-export const selectDataAuth = state => state.dataLogin; //selector
+export const selectDataAuth  = state => state.dataLogin; //selector
 export default loginSlice.reducer; // Export the reducer
 

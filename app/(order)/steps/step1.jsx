@@ -122,20 +122,20 @@ export default function step1({ setActiveStep }) {
       </ScrollView>
       <View style={styles.footerContainer}>
         <View style={styles.footer}>
-          <Text style={styles.price}>{formatIDR(data.price || 0)}</Text>
+          {/* <Text style={styles.price}>{formatIDR(data.price || 0)}</Text>
           <View style={styles.buttonContainer}>
             <Button
               disabled={!selectedBank}
               color="#3D7B3F"
               onPress={() => {
                 setActiveStep(1);
-              }}
-              title="Lanjutkan Pembayaran"
-            />
-          </View>
+              }} */}
+          {/* title="Lanjutkan Pembayaran"
+            /> */}
         </View>
       </View>
     </View>
+    // </View>
   );
 }
 
