@@ -38,19 +38,55 @@ export default function Step2() {
     await Clipboard.setStringAsync(text);
   };
 
+  // const pickImage = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+
+  //   console.log(result);
+
+  //   if (!result.canceled) {
+  //     setImage(result.assets[0].uri);
+  //   }
+  // };
+  const formatCurrency = new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+  });
+
   const pickImage = async () => {
+    // Request permission to access the media library
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission to access camera roll is required!");
+      return;
+    }
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
+
     console.log(result);
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      return true; // Indicate that an image was selected
+
+    if (result.canceled) {
+      Alert.alert("Image selection was canceled."); // Alert if canceled
+      return; // Exit the function if canceled
     }
-    return false; // Indicate that no image was selected
+
+    if (result.assets && result.assets.length > 0) {
+      setImage(result.assets[0].uri); // Update state with the selected image URI
+      // Add your upload logic here if needed
+    } else {
+      Alert.alert("No image selected."); // Alert if no image is selected
+    }
   };
 
   const formattedDate = new Date(getDate24()).toLocaleString("id-ID", {
@@ -128,7 +164,7 @@ export default function Step2() {
           },
         ]}
       >
-        <Text>Rp 230.000</Text>
+        <Text>{formatCurrency.format(data.price)}</Text>
         <TouchableOpacity onPress={() => copyToClipboard((230000).toString())}>
           <Ionicons color={"#3C3C3C"} name={"copy-outline"} size={14} />
         </TouchableOpacity>

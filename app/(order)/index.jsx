@@ -38,12 +38,13 @@ export default function Index() {
     const payload = {
       formData: {
         start_rent_at: moment().format("YYYY-MM-DD"),
-        finish_rent_at: moment().add(1, "day").format("YYYY-MM-DD"),
+        finish_rent_at: moment().add(4, "day").format("YYYY-MM-DD"),
         car_id: data.id,
       },
       token: token,
     };
     await dispatch(postOrder(payload));
+    setActiveStep(1);
   };
 
   useEffect(() => {
@@ -55,6 +56,13 @@ export default function Index() {
       setActiveStep(activeStep + 1);
     }
   }, []);
+
+  useEffect(() => {
+    if (activeStep === 1) {
+      dispatch(resetState()); // Reset state when activeStep is 1
+    }
+    console.log(activeStep);
+  }, [activeStep]);
 
   return (
     <View style={{ flex: 1, justifyContent: "space-between" }}>

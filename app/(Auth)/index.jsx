@@ -32,7 +32,7 @@ async function save(value) {
 export default function index() {
   const { data, errorMessage, isModalVisible, isError, isLogin } =
     useSelector(selectDataAuth);
-  const [modalVisible, setModalVisible] = useState(false);
+  // const [modalVisible, setModalVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
 
