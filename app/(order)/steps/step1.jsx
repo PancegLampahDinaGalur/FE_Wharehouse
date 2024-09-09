@@ -26,7 +26,7 @@ const paymentMethods = [
   { bankName: "BNI", account: 12345678, name: "a. n Super Travel" },
 ];
 
-export default function step1({ setActiveStep }) {
+export default function step1({ setActiveStep, onPress }) {
   // Assuming setActiveStep is passed as a prop
   const [promoText, setPromoText] = useState(null);
   const { selectedBank, promo } = useSelector(selectOrder);

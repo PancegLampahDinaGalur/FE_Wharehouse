@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1725872433324" clover="3.2.0">
+  <project timestamp="1725872433324" name="All files">
+    <metrics statements="19" coveredstatements="17" conditionals="20" coveredconditionals="11" methods="6" coveredmethods="5" elements="45" coveredelements="33" complexity="0" loc="19" ncloc="19" packages="4" files="6" classes="6"/>
+    <package name="assets.images">
+      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="killua.png" path="C:\Users\localuser\ReactXexpo\carrentalXexpo\assets\images\killua.png">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="components">
+      <metrics statements="10" coveredstatements="9" conditionals="16" coveredconditionals="9" methods="5" coveredmethods="4"/>
+      <file name="CarList.jsx" path="C:\Users\localuser\ReactXexpo\carrentalXexpo\components\CarList.jsx">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="45" count="1" type="stmt"/>
+      </file>
+      <file name="Grid.jsx" path="C:\Users\localuser\ReactXexpo\carrentalXexpo\components\Grid.jsx">
+        <metrics statements="4" coveredstatements="3" conditionals="5" coveredconditionals="3" methods="3" coveredmethods="2"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="25" count="4" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+      </file>
+      <file name="ThemedText.tsx" path="C:\Users\localuser\ReactXexpo\carrentalXexpo\components\ThemedText.tsx">
+        <metrics statements="3" coveredstatements="3" conditionals="11" coveredconditionals="6" methods="1" coveredmethods="1"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="constants">
+      <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="Colors.ts" path="C:\Users\localuser\ReactXexpo\carrentalXexpo\constants\Colors.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="hooks">
+      <metrics statements="5" coveredstatements="4" conditionals="4" coveredconditionals="2" methods="1" coveredmethods="1"/>
+      <file name="useThemeColor.ts" path="C:\Users\localuser\ReactXexpo\carrentalXexpo\hooks\useThemeColor.ts">
+        <metrics statements="5" coveredstatements="4" conditionals="4" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="14" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="17" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // Add useEffect
 import {
   Modal,
   View,
@@ -9,40 +9,104 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker"; // Ensure this is imported
+import * as ImagePicker from "expo-image-picker";
+import { useDispatch, useSelector } from "react-redux";
+import { ErrorMessage } from "formik";
+import { selectDataAuth } from "@/redux/reducers/auth/loginSlice";
+import {
+  selectOrder,
+  setStateByName,
+  putOrderSlip,
+} from "@/redux/reducers/order/orderSlice";
+import { selectCar } from "@/redux/reducers/car/carDetailSlice";
 
 const ConfirmationModal = ({ visible, onClose, onConfirm }) => {
   const [image, setImage] = useState(null); // Define the image state
+  const [countdown, setCountdown] = useState(600); // Initialize countdown (10 minutes in seconds)
+  const dispatch = useDispatch();
+  const { selectedBank, promo, dataOrder, status } = useSelector(selectOrder);
+  const { data: user } = useSelector(selectDataAuth);
+  const { data } = useSelector(selectCar);
+
+  useEffect(() => {
+    let timer;
+    if (countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else {
+      clearInterval(timer);
+    }
+    return () => clearInterval(timer); // Cleanup on unmount
+  }, [countdown]);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(minutes).padStart(2, "0")} : ${String(secs).padStart(
+      2,
+      "0"
+    )}`;
+  };
 
   const pickImage = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
-      Alert.alert("Permission to access camera roll is required!");
-      return;
-    }
+    try {
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (permissionResult.granted === false) {
+        Alert.alert("Permission to access camera roll is required!");
+        return;
+      }
 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
 
-    if (!result.canceled) {
-      return result.assets[0].uri; // Return the URI of the selected image
+      if (!result.canceled) {
+        const imageSel = result.assets[0].uri; // Call the image picker
+        if (imageSel) {
+          setImage({
+            uri: imageSel,
+            type: result.assets[0].mimeType,
+            name: result.assets[0].fileName,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error picking image: ", error);
+      Alert.alert("An error occurred while picking the image.");
     }
-    return null; // Return null if canceled
+    return null; // Return null if canceled or an error occurred
   };
 
   const handleUpload = async () => {
-    const imageSelected = await pickImage(); // Call the image picker
-    if (imageSelected) {
-      setImage(imageSelected); // Set the image state with the selected image URI
-      onConfirm(); // Call onConfirm to handle the upload logic
-      onClose(true); // Pass true to onClose when upload is successful
+    if (image) {
+      // setImage(image);
+      console.log(image);
+      const formData = new FormData();
+      formData.append("slip", image);
+      dispatch(
+        putOrderSlip({
+          token: user.access_token,
+          id: dataOrder.id,
+          formData,
+        })
+      ); // digunakan ketika ngiirm file
+      console.log("confirmation dataorder", dataOrder);
     }
   };
+
+  useEffect(() => {
+    console.log("test lur", status);
+    if (status === "upload-success") {
+      // dispatch(setStateByName({ name: "activeStep", value: 2 }));
+    } else {
+      console.log(ErrorMessage);
+    }
+  }, [status]);
 
   return (
     <Modal
@@ -59,12 +123,14 @@ const ConfirmationModal = ({ visible, onClose, onConfirm }) => {
             akan segera kami cek, tunggu kurang lebih 10 menit untuk mendapatkan
             konfirmasi.
           </Text>
-          {image && ( // Check if an image is uploaded
-            <Image source={{ uri: image }} style={styles.uploadedImage} /> // Display the uploaded image
+          <Text style={styles.countdownText}>{formatTime(countdown)}</Text>
+          {image ? ( // Check if an image is uploaded
+            <Image source={{ uri: image.uri }} style={styles.uploadedImage} /> // Display the uploaded image
+          ) : (
+            <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
+              <Ionicons name="image-outline" size={50} color="#3c3c3c" />
+            </TouchableOpacity>
           )}
-          <TouchableOpacity style={styles.uploadButton} onPress={handleUpload}>
-            <Ionicons name="image-outline" size={50} color="#3c3c3c" />
-          </TouchableOpacity>
           <TouchableOpacity style={styles.confirmButton} onPress={handleUpload}>
             <Text style={styles.confirmButtonText}>Upload</Text>
           </TouchableOpacity>
@@ -72,7 +138,6 @@ const ConfirmationModal = ({ visible, onClose, onConfirm }) => {
             style={styles.orderButton}
             onPress={() => {
               onClose(true); // Call onClose to close the modal
-              // You can add any additional logic here if needed
             }}
           >
             <Text style={styles.orderButtonText}>Submit</Text>
@@ -117,16 +182,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  timerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  uploadedImage: {
+    width: 320,
+    height: 260,
     marginBottom: 20,
-  },
-  timerText: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "red",
-    marginLeft: 5,
+    borderRadius: 10,
   },
   uploadButton: {
     width: 320,
@@ -167,11 +227,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  uploadedImage: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
-    borderRadius: 10,
+  countdownText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#FF0000", // Change color as needed
+    marginTop: 10,
+  },
+  countdownText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#FF0000", // Change color as needed
+    marginTop: 10,
   },
 });
 

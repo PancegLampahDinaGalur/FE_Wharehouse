@@ -48,8 +48,8 @@ export default function Index() {
   };
 
   useEffect(() => {
-    console.log("dataOrder Before: ", dataOrder);
-    dispatch(resetState());
+    // console.log("dataOrder Before: ", dataOrder);
+    // dispatch(resetState());
     console.log("dataOrder After: ", dataOrder);
     if (Object.keys(dataOrder).length > 0 && !isLoading) {
       console.log("dataOrder", dataOrder);
@@ -59,7 +59,7 @@ export default function Index() {
 
   useEffect(() => {
     if (activeStep === 1) {
-      dispatch(resetState()); // Reset state when activeStep is 1
+      // dispatch(resetState()); // Reset state when activeStep is 1
     }
     console.log(activeStep);
   }, [activeStep]);

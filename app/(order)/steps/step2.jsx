@@ -12,7 +12,12 @@ import React, { useEffect, useState } from "react";
 import CarList from "@/components/CarList";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCar } from "@/redux/reducers/car/carDetailSlice";
-import { selectOrder } from "@/redux/reducers/order/orderSlice";
+import {
+  selectOrder,
+  setStateByName,
+  putOrderSlip,
+} from "@/redux/reducers/order/orderSlice";
+import { selectDataAuth } from "@/redux/reducers/auth/loginSlice";
 import { Ionicons } from "@expo/vector-icons";
 import CountDown from "react-native-countdown-component-maintained";
 import * as Clipboard from "expo-clipboard";
@@ -76,6 +81,14 @@ export default function Step2() {
 
     console.log(result);
 
+    if (!result.canceled) {
+      setImage({
+        uri: result.assets[0].uri,
+        name: result.assets[0].fileName,
+        type: result.assets[0].mimeType,
+      });
+    }
+
     if (result.canceled) {
       Alert.alert("Image selection was canceled."); // Alert if canceled
       return; // Exit the function if canceled
@@ -99,9 +112,11 @@ export default function Step2() {
     second: "numeric",
   });
 
-  // useEffect(() => {
-  //   console.log("dataOrder", dataOrder);
-  // }, []);
+  useEffect(() => {
+    //console.log("dataOrder", dataOrder);
+    console.log("modal visible", modalVisible);
+    console.log("step 2", dataOrder);
+  }, [modalVisible]);
 
   return (
     <View style={styles.container}>
@@ -183,26 +198,28 @@ export default function Step2() {
       </TouchableOpacity>
       <ConfirmationModal
         visible={modalVisible}
-        onClose={(success) => {
+        onClose={() => {
           setModalVisible(false);
-          if (success) {
-            // Handle success case
-            // For example, navigate to the order list screen or refresh the order list
-            // dispatch(fetchOrders()); // Assuming you have a fetchOrders action
-          }
         }}
-        onConfirm={async () => {
-          // Logic for handling confirmation
-          // For example, you might want to dispatch an action to confirm the payment
-          try {
-            // Assuming you have a confirmPayment action
-            await dispatch(confirmPayment({ image, promoText })); // Pass necessary data
-            Alert.alert("Success", "Payment confirmed successfully!");
-          } catch (error) {
-            Alert.alert("Error", "There was an issue confirming your payment.");
-          }
-        }}
-        pickImage={pickImage} // Pass the pickImage function
+        //   setModalVisible(false);
+        //   if (success) {
+        //     // Handle success case
+        //     // For example, navigate to the order list screen or refresh the order list
+        //     // dispatch(fetchOrders()); // Assuming you have a fetchOrders action
+        //   }
+        // }}
+        // onConfirm={async () => {
+        //   // Logic for handling confirmation
+        //   // For example, you might want to dispatch an action to confirm the payment
+        //   try {
+        //     // Assuming you have a confirmPayment action
+        //     await dispatch(confirmPayment({ image, promoText })); // Pass necessary data
+        //     Alert.alert("Success", "Payment confirmed successfully!");
+        //   } catch (error) {
+        //     Alert.alert("Error", "There was an issue confirming your payment.");
+        // //   }
+        // }}
+        // pickImage={pickImage} // Pass the pickImage function
       />
     </View>
   );

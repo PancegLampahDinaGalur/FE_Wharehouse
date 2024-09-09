@@ -36,7 +36,7 @@ const orderSlice = createSlice({
       state.isLoading = false;
       state.dataOrder = action.payload;
       console.log('data fullfilled', action.payload);
-      state,status = "success";
+      state.status = "success";
     });
     builder.addCase(postOrder.rejected, (state, action) => {
       state.isLoading = false
@@ -46,14 +46,19 @@ const orderSlice = createSlice({
 
     builder.addCase(putOrderSlip.pending, (state, action) => {
       state.isLoading = true;
+      console.log("slip pending")
     });
     builder.addCase(putOrderSlip.fulfilled, (state, action) => {
       state.isLoading = false;
       state.dataOrder = action.payload;
+      console.log("slip ok")
+      state.status = "upload-success";
     });
     builder.addCase(putOrderSlip.rejected, (state, action) => {
       state.isLoading = false
       state.errorMessage = action.payload
+      console.log("slip err", action.payload)
+
     });
 
 
