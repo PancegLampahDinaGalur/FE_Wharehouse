@@ -174,7 +174,7 @@ export default function Profile() {
               </>
             )}
             <Image
-              source={require("@/assets/images/killua.png")}
+              source={require("@/assets/images/img_photo.png")}
               style={styles.image}
             />
             <Text style={styles.cardText}>

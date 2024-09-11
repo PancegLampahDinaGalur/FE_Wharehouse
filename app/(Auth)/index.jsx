@@ -19,6 +19,15 @@ import {
 } from "@/redux/reducers/auth/loginSlice";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+} from "@react-native-google-signin/google-signin";
+import auth from "@react-native-firebase/auth";
+
+GoogleSignin.configure({
+  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+});
 
 const loginSchema = Yup.object().shape({
   password: Yup.string().required("Required"),
@@ -41,6 +50,32 @@ export default function index() {
     dispatch(postlogin(values));
     await save(data);
   };
+
+  async function onGoogleButtonPress() {
+    // Check if your device supports Google Play
+    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    // Get the users ID token
+    const {
+      data: { idToken },
+    } = await GoogleSignin.signIn();
+
+    // Create a Google credential with the token
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+    console.log(idToken, googleCredential);
+
+    // Sign-in the user with the credential
+    return auth().signInWithCredential(googleCredential);
+  }
+
+  function onAuthStateChanged(user) {
+    console.log(user);
+    // if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
 
   useEffect(() => {
     if (isModalVisible) {
@@ -137,6 +172,14 @@ export default function index() {
         <Link href="../(Auth)/register" style={styles.signUpLink}>
           Sign Up for free
         </Link>
+      </View>
+      <View>
+        <GoogleSigninButton
+          size={GoogleSigninButton.Size.Wide}
+          color={GoogleSigninButton.Color.Dark}
+          onPress={onGoogleButtonPress}
+          // disabled={isInProgress}
+        />
       </View>
       <ModalPopup visible={isModalVisible}>
         <View style={styles.modalBackground}>
