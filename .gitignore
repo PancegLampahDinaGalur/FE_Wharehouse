@@ -20,4 +20,5 @@ expo-env.d.ts
 # @end expo-cli
 
 coverage
-android 
+android
+google-services.json 
