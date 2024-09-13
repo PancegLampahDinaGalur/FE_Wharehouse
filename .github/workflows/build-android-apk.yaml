@@ -12,11 +12,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Create Google Services JSON File
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: |
-          echo $GOOGLE_SERVICES_JSON > google-services.json
+      # - name: Create Google Services JSON File
+      #   env:
+      #     GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+      #   run: |
+      #     echo $GOOGLE_SERVICES_JSON > google-services.json
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
